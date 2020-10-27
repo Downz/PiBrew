@@ -5,9 +5,9 @@ from shared.apiCalls import ApiCalls
 from shared.util.util import timestamp_print
 
 
-def post_fertilizer_log(successful_dosing):
+def post_fertilizer_log(successful_dosing, dose_amount):
     successful_dosing: bool = successful_dosing in ["true", "1", True, 1]
-    data = {"successfulDosing": successful_dosing}
+    data = {"successfulDosing": successful_dosing, "doseAmount": dose_amount}
     timestamp_print("fertilizer data: " + str(data))
     ApiCalls('aquarium/postfertilizerlog/').post_log_to_server(data)
 
@@ -17,6 +17,7 @@ class TimeChecker:
     time = datetime.today()
     # 5 min delay
     timer_max_delay = 60*5
+    dose_amount = 5
     
     def __init__(self, time):
         self.time = time
@@ -55,6 +56,8 @@ class TimeChecker:
     def fertilize(self):
         timestamp_print("Fertilize")
         if self.mega:
-            self.mega.relay_timed(0, 5)
+            success = self.mega.relay_timed(0, self.dose_amount)
+            post_fertilizer_log(success, self.dose_amount)
+
         t = Timer(self.timer_max_delay, self.fertilize_time_controller)
         t.start()
