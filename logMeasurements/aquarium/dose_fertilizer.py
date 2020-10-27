@@ -1,7 +1,16 @@
 from datetime import datetime, timedelta
 from threading import Timer
 from shared import megaApi
+from shared.apiCalls import ApiCalls
 from shared.util.util import timestamp_print
+
+
+def post_fertilizer_log(successful_dosing):
+    successful_dosing: bool = successful_dosing in ["true", "1", True, 1]
+    data = {"successfulDosing": successful_dosing}
+    timestamp_print("fertilizer data: " + str(data))
+    ApiCalls('aquarium/postfertilizerlog/').post_log_to_server(data)
+
 
 class TimeChecker:
     mega: megaApi.MegaApi
