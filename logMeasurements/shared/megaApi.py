@@ -5,8 +5,9 @@ class MegaApi:
 
     def __init__(self):
         #self.ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=10)
-        self.ser = serial.Serial('/dev/serial0', 115200, timeout=10)
-    
+        #self.ser = serial.Serial('/dev/serial0', 115200, timeout=10) 
+        self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=10)
+
     def clear_serial_read(self):
         timestamp_print("Flush")
         self.ser.reset_input_buffer()
