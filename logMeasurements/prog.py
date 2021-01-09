@@ -16,9 +16,8 @@ class Program:
 
     if not debug:
         mega = MegaApi()
-        mega.clear_serial_read()
-        time_checker = TimeChecker(dose_time)
-        time_checker.dosing_version(dose_time, mega)
+        time_checker = TimeChecker(dose_time, mega)
+        time_checker.fertilize_time_controller()
     else:
         time_checker = TimeChecker(dose_time)
 
@@ -48,6 +47,7 @@ class Program:
         t.start()
 
 
-something = Program()
+Program()
+
 while True:
     delay.sleep(60 * 60 * 24)

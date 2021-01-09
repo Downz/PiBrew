@@ -12,7 +12,7 @@ def wait_for_wifi():
         if wifi_ip is not None:
             return
         timestamp_print("No internet")
-        sleep(5)
+        sleep(10)
 
 
 class ApiCalls:
@@ -23,19 +23,20 @@ class ApiCalls:
 
     def post_log_to_server(self, data):
         if post_to_server:
-            posted = False
-            while not posted:
+            while True:
                 wait_for_wifi()
                 try:
-                    x = requests.post(self.host + self.url, data=data, timeout=10)
+                    x = requests.post(self.host + self.url, timeout=3, data=data)
                     print(str(x.status_code))
-                    posted = True
-                    if 200 <= x.status_code < 300:
-                        return True
-                    return False
+                    x.raise_for_status()
+                    return True
                     
                 except requests.exceptions.Timeout:
                     timestamp_print("Post to server - timeout")
+                except requests.exceptions.HTTPError:
+                    timestamp_print("Bad status code: " + str(x.status_code))
+                    return False
                 except requests.exceptions.RequestException as e:
                     timestamp_print("Post to server - ConnectionError" + e)
-        return True
+                except Exception as e:
+                    timestamp_print("Some exception from API-calls: " + e)

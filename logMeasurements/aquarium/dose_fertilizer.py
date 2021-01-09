@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from threading import Timer
 from shared import megaApi
 from shared.apiCalls import ApiCalls
@@ -14,23 +14,20 @@ def post_fertilizer_log(successful_dosing, dose_amount):
 
 class TimeChecker:
     mega: megaApi.MegaApi
-    time = datetime.today()
-    # 5 min delay
-    timer_max_delay = 60*5
-    dose_amount = 5
+    time: time
+    # 10 min delay
+    timer_max_delay = 60*10
+    dose_amount = 7
     
-    def __init__(self, time):
+    def __init__(self, time, mega):
         self.time = time
-        self.fertilize_time_controller()
+        self.mega = mega
 
-    @classmethod
-    def dosing_version(cls, time, mega):
-        cls.time = time
-        cls.mega = mega
 
     def fertilize_time_controller(self):
         now = datetime.today()
         next_time = now.replace(
+            year=now.year,
             day=now.day,
             hour=self.time.hour,
             minute=self.time.minute,
@@ -38,13 +35,12 @@ class TimeChecker:
             microsecond=0
         )
         secs = (next_time - now).total_seconds()
-        if secs <= self.timer_max_delay:
-            if secs < 0:
-                secs += timedelta(days=1).total_seconds()
-            else:
-                t = Timer(self.timer_max_delay, self.fertilize)
-                t.start()
-                return
+        timestamp_print("Dosetime: " + str(self.time) + ", now: " + str(now) + ", next: " + str(next_time) + ", Secs to next fertilizerdose: " + str(secs)) 
+        
+        if 0 < secs <= self.timer_max_delay:
+            t = Timer(secs + 10, self.fertilize)
+            t.start()
+            return
 
         self.wait_longer()
 
